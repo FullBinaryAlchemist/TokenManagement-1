@@ -116,8 +116,11 @@ class RoundController extends Controller
         $student_id=$request->user()->student->id;
         $participant = Participant::where("student_id",$student_id)->where("submission_id",$submission->id)->first();
         //dd($participant); 
-
+        //clearing the previous round score
+        $participant->update(["correct"=>0,"wrong"=>0,"score"=>0,]);
+        
         $answers=$request->post();
+        
         $correct=0;
         $wrong=0;
         //dd($answers);
@@ -128,7 +131,7 @@ class RoundController extends Controller
             //dd($question_id);
             $question = Questions::find($question_id);
             print "Answer Received for $question_id is $answer_value";
-
+ 
             if($question->correct_option == $answer_value){
                 $correct++;
                 print "Answer is correct\n";
@@ -147,6 +150,7 @@ class RoundController extends Controller
         $score+= $correct*3 + $wrong*(-1);
         
         $participant->update(["score"=>$score]);
+        
         \Log::debug("Submission:{$submission->id} Round_id:{$round_id->round_id} P_id:{$participant->id} Name:{$participant->student->sName} C:{$participant->correct} W:{$participant->wrong}");
          //dd("Total:",$request->post(),"C:",$correct,"W:",$wrong, "score",$score);
         //sleep(10);

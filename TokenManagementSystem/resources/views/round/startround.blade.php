@@ -27,7 +27,7 @@
 
 	<div class=center-align>
 		<h5>
-			<span id="start-message"><strong>PLEASE KEEP THIS PAGE OPEN .ROUND WILL BEGIN SOON</strong></span>
+			<span id="start-message"><strong>PLEASE KEEP THIS PAGE OPEN.DON'T PRESS REFRESH OR BACK .ROUND WILL BEGIN SOON</strong></span>
 		</h5>
 		<h5>
 			<div id="question_display"></div>
@@ -65,7 +65,8 @@
 		var form_id="response_"+participant_id;
 		var timer_sec=10;
 		var submit_url="{{url()->current()}}";
-		submit_url=submit_url.replace("/startRound","/");
+		submit_url=submit_url.replace("/startRound"," ");
+
 		var t1,t2,t3;
 
 		var csrf_tag= document.createElement('meta'); //<meta name="csrf-token" content="{{ csrf_token() }}">
@@ -165,6 +166,7 @@
 
 
 							document.body.appendChild(question_form);
+							debugger;
 							question_form.submit();
 							});
 						 	

@@ -39,6 +39,7 @@ class AllocateToken
         $student_id=$event->participant->student_id;
         
         //dd($round_id,$submission,$student_id);
+        \Log::debug("AllocateToken called for sid: $student_id for Subm:$submission->id R:$round_id->round_id");
 
         $checkToken= Token::where('submission_id',$submission->id)
                             ->where('student_id',$student_id)
@@ -47,6 +48,7 @@ class AllocateToken
         if($checkToken)
             {
                 //dd("Print here",$checkToken,"TOken exists so returning for event handler");
+                \Log::debug("AllocateToken listener returned FALSE for Subm:$submission->id R:$round_id->round_id called by sid:$student_id ");
 
                 return false;
 
@@ -65,6 +67,8 @@ class AllocateToken
 
         $winners= $participants->splice(0,3)->values(); //removing the first three winners from participants and getting there ids
         //dd($winners);
+        \Log::debug("Winners are $winners");
+        
         $winners->each( function($winner,$key){
             //global $submission;
             //$participant=     
@@ -75,7 +79,8 @@ class AllocateToken
                 $lastTokenValue=0;
              //dd($lastTokenValue);
             
-            $round = Round::where("participant_id",$winner->id)->get("round_id")->first();
+            $round = Round::where("participant_id",$winner->id)->get("round_id")->last();
+            \Log::debug("Token for Rid:{$round->round_id} being awarded to Pid:{$winner->id}");
             Token::create(['submission_id'=>$winner->submission_id,
                             'student_id'=>$winner->student_id,
                             'round_id'=>$round->round_id,
@@ -86,7 +91,8 @@ class AllocateToken
         //giving the losers token of values -1
         $participants->each(function($loser,$key){
              //$lastTokenValue= Token::where('submission_id',$loser->submission_id)->orderBy("value","desc")->first()->value;
-            $round = Round::where("participant_id",$loser->id)->get("round_id")->first();
+            $round = Round::where("participant_id",$loser->id)->get("round_id")->last();
+            \Log::debug("Token for Rid:{$round->round_id} being awarded to Pid:{$loser->id}");
             Token::create(['submission_id'=>$loser->submission_id,
                             'student_id'=>$loser->student_id,
                             'round_id'=>$round->round_id,

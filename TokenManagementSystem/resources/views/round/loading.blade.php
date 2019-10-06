@@ -34,13 +34,14 @@
 </div>
 </div>
 
-<script type="module" defer>
+<script type="module">
 	var t;
 
 	function checkToken(){
 			console.log("inside checkToken");
 			$.ajax({ method:"GET", url:"/tokens/{{$participant->id}}/{{$round_id->round_id}}/?t="+Math.random(), async:false,success: function(data){
     				console.log(data);
+    				console.log("Ajax call to"+"/tokens/{{$participant->id}}/{{$round_id->round_id}}/?t="+Math.random());
       				var result=data;
     				if(result.result){
     					clearInterval(t);

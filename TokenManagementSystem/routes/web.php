@@ -17,7 +17,8 @@ Route::get('/', function () {
 	//dd(Auth::check());
 	if (Auth::check()) {
 		if (Auth::user()->type === "Teacher") {
-			return view('home');
+			$unReadNotifCount = 0;
+			return view('home', compact('unReadNotifCount'));
 		}
 		elseif (Auth::user()->type === "Student") {
 			$unReadNotifCount = StudentCalls::getUnReadNotifCount();
@@ -47,6 +48,8 @@ Route::get('teacher/profile', 'TeachersController@profile')->name('teacher.profi
 
 Route::get('student/submissions', 'StudentsController@submissions')->name('student.submissions');
 Route::get('student/notifications', 'StudentsController@showNotifications')->name('student.notifications');
+Route::get('student/sendNotifCount', 'StudentsController@sendAjaxNotifCount');
+Route::get('student/sendUnreadNotifications', 'StudentsController@sendAjaxUnreadNotif');
 Route::get('student/profile', 'StudentsController@profile')->name('student.profile');
 
 //subjects
@@ -60,7 +63,7 @@ Route::get('student/submissions/{submission}/participants','ParticipantControlle
 
 Route::get('rounds/{submission}/{round_id}/','RoundController@shouldStartRound');
 Route::get('rounds/{submission}/{round_id}/startRound','RoundController@index')->name("round.start");
-Route::post('rounds/{submission}/{round_id}/','RoundController@submitAnswers')->name("round.submit");
+Route::post('rounds/{submission}/{round_id}','RoundController@submitAnswers')->name("round.submit");
 Route::get('rounds/{submission}/{round_id}/{participant}/forcesubmit','RoundController@forceFireRoundCompletedEvent')->name('round.force');
 
 Route::get('questions/{question}','QuestionsController@show'); //retrieves the question object
@@ -79,3 +82,5 @@ Route::view('loading','round.loading')->name('round.wait');
 
 Route::get('tokens/{participant}/{round}','TokenController@getTokenForSubmissionRound')->name('token.get');
 Route::get('tokens/redirect/{participant}/{round}','TokenController@redirectToNotification')->name('token.redirect');
+
+//Route::redirect('rounds/{submission}/{round_id}/', '/loading', 301);
