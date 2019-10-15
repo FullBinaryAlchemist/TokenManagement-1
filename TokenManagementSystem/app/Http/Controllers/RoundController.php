@@ -23,11 +23,15 @@ class RoundController extends Controller
     //     dd($this);
     // }
 
-    public function index(Submissions $submission,Round $round_id,Request $request)
+    public function index(Submissions $submission,$round_id,Request $request)
     {
         $student_id= $request->user()->student->id;
         //checks if user is a participant of that round
         $participant = Participant::where('student_id',$student_id)->where('submission_id',$submission->id)->firstOrFail();
+        
+        $round_id=Round::where("submission_id",$submission->id)->where("participant_id",$participant->id)->firstOrFail();
+        
+        //dd($student_id,$participant,$submission,$round_id);
         return view('round/startround',compact('submission','round_id','participant'));
     }
 
@@ -106,13 +110,17 @@ class RoundController extends Controller
         return response($result,200);
     }
 
-    public function forceFireRoundCompletedEvent(Submissions $submission, Round $round_id, Participant $participant){
+    public function forceFireRoundCompletedEvent(Submissions $submission, $round_id, Participant $participant){
+        $round_id=Round::where("submission_id",$submission->id)->where("round_id",$round_id)->firstOrFail();
+        
         event(new RoundCompletedEvent($submission,$round_id,$participant));
     }
 
-    public function submitAnswers(Submissions $submission, Round $round_id,Request $request ){
+    public function submitAnswers(Submissions $submission, $round_id,Request $request ){
         //dd($request->post());
-        //dd($round_id);
+        $round_id=Round::where("submission_id",$submission->id)->where("round_id",$round_id)->firstOrFail();
+        
+        //dd($submission,$round_id);
         $student_id=$request->user()->student->id;
         $participant = Participant::where("student_id",$student_id)->where("submission_id",$submission->id)->first();
         //dd($participant); 

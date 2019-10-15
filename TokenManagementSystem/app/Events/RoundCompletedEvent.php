@@ -27,6 +27,8 @@ class RoundCompletedEvent
     public $participant;
     public function __construct(Submissions $submission, Round $round_id, $participant)
     {
+        \Log::debug("Calling from RoundCompletedEvent for S:$submission->id R:{$round_id} P:$participant");
+
         $this->submission=$submission;
         $this->round_id=$round_id;
         $this->participant=$participant;

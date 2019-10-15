@@ -35,11 +35,14 @@ class JoinRound
         $submission = $participant->submission;
         $rounds = $submission->rounds;
         
+        //dd($participant,$submission,$rounds);
+        
         $max_participants =5;
         $nrn=1; //checks if newRound is needed
 
         if($rounds == null){
             //call the event to create new round
+            dd("Rounds for $sumission->id are null NewRoundNeeded is fired");
             event (new NewRoundNeeded($participant,$submission));
         }
         //new round will be created/ or exists
@@ -47,12 +50,13 @@ class JoinRound
         $rounds= $rounds->groupBy('round_id')->toArray();
 
         foreach ($rounds as $round_id => $round) {
+            //dd($round);
             if(count($round)<$max_participants){
-
+                //dd($round,"Count of this is less than 5");
                 $emptyRound=Round::where('round_id',$round_id)->where('participant_id',null)->first();
                 
                 if($emptyRound==null){
-                    $tempRound=Round::where('round_id',$round_id)->first();//to get the questions
+                    $tempRound=Round::where("submission_id",$submission->id)->where('round_id',$round_id)->first();//to get the questions
                     Round::create(['q1'=>$tempRound->q1,
                                    'q2'=>$tempRound->q2,
                                    'q3'=>$tempRound->q3,
@@ -64,7 +68,7 @@ class JoinRound
                     ]);
                 }
                 else{
-                     $update=Round::where('round_id',$round_id)->where('participant_id',null)->first()->update(['participant_id'=>$participant->id,'updated_at'=>now()]);
+                     $update=Round::where("submission_id",$submission->id)->where('round_id',$round_id)->where('participant_id',null)->first()->update(['participant_id'=>$participant->id,'updated_at'=>now()]);
 
                      if($update){print 'Updated successfully';}
                      else{print 'error occurred';}
